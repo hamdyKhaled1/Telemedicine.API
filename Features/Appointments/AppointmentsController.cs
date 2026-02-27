@@ -1,15 +1,20 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Telemedicine.API.Common;
 using Telemedicine.API.Features.Appointments.Create;
 using Telemedicine.API.Features.Appointments.Delete;
 using Telemedicine.API.Features.Appointments.GetAll;
 using Telemedicine.API.Features.Appointments.GetById;
+using Telemedicine.API.Features.Appointments.Update;
+using Telemedicine.API.Infrastructure.Data;
 
 namespace Telemedicine.API.Features.Appointments
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AppointmentsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -20,44 +25,55 @@ namespace Telemedicine.API.Features.Appointments
         }
 
         [HttpPost]
+        [Authorize(Roles = "Patient")]
         public async Task<IActionResult> Create(CreateAppointmentCommand command)
         {
-            var id = await _mediator.Send(command);
-            return Ok(id);
+            var result = await _mediator.Send(command);
+            return result.Success ? Ok(result) : BadRequest(result);
         }
 
 
-       
+
         /// Retrieves all appointments.
-       
+
         [HttpGet]
+        [Authorize(Roles = "Doctor,Admin")]
         public async Task<IActionResult> GetAll()
         {
             var result = await _mediator.Send(new GetAllAppointmentsQuery());
             return Ok(result);
         }
 
-        
-        /// Retrieves single appointment by id.
-       
+
+        /// Retrieves  appointment by id.
+
         [HttpGet("{id}")]
+        [Authorize(Roles = "Doctor,Patient,Admin")]
         public async Task<IActionResult> GetById(int id)
         {
-            var result = await _mediator.Send(
-                new GetAppointmentByIdQuery(id));
+            var result = await _mediator.Send(new GetAppointmentByIdQuery(id));
+            return result.Success ? Ok(result) : NotFound(result);
+        }
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Doctor,Admin")]
+        public async Task<IActionResult> Update(int id,[FromBody] UpdateAppointmentCommand command)
+        {
+            
+            if (id != command.Id)
+                return BadRequest(new { Success = false, Message = "Id in URL must match Id in body." });
 
-            return Ok(result);
+            var result = await _mediator.Send(command);
+            return result.Success ? Ok(result) : BadRequest(result);
         }
 
+        /// delete appointment.
 
-        
-        /// Soft deletes appointment.
-        
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _mediator.Send(new DeleteAppointmentCommand(id));
-            return Ok("Appointment soft deleted.");
+            var result = await _mediator.Send(new DeleteAppointmentCommand(id));
+            return result.Success ? Ok(result) : BadRequest(result);
         }
     }
 }

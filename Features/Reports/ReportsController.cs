@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,23 +16,20 @@ namespace Telemedicine.API.Features.Reports
             _mediator = mediator;
         }
 
-        /// <summary>
+
         /// Returns appointment report as PDF file.
-        /// Example:
-        /// GET /api/reports/appointments?id=1
-        /// GET /api/reports/appointments
-        /// </summary>
+
+        
         [HttpGet("appointments")]
         public async Task<IActionResult> GetAppointmentsReport([FromQuery] int? id)
         {
-            var pdfBytes = await _mediator
-                .Send(new GetAppointmentReportQuery(id));
+            var result = await _mediator.Send(new GetAppointmentReportQuery(id));
 
-            return File(
-                pdfBytes,
-                "application/pdf",
-                "AppointmentsReport.pdf"
-            );
+            if (!result.Success)
+                return NotFound(new { result.Success, result.Message });
+
+            return File(result.Data!, "application/pdf", "AppointmentsReport.pdf");
         }
-    }
+    
+}
 }

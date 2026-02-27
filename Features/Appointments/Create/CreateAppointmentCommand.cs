@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Telemedicine.API.Common;
 
 namespace Telemedicine.API.Features.Appointments.Create
 {
@@ -7,5 +8,5 @@ namespace Telemedicine.API.Features.Appointments.Create
      int PatientId,
      DateTime StartTime,
      DateTime EndTime
- ) : IRequest<int>;
+ ) : IRequest<Result<AppointmentResponse>>;
 }

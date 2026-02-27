@@ -1,10 +1,11 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Telemedicine.API.Common;
 using Telemedicine.API.Infrastructure.Data;
 
 namespace Telemedicine.API.Features.Appointments.GetAll
 {
-    public class GetAllAppointmentsHandler: IRequestHandler<GetAllAppointmentsQuery, List<AppointmentDto>>
+    public class GetAllAppointmentsHandler: IRequestHandler<GetAllAppointmentsQuery, Result<List<AppointmentResponse>>>
     {
         private readonly TelemedicineDbContext _context;
 
@@ -16,24 +17,24 @@ namespace Telemedicine.API.Features.Appointments.GetAll
         /// <summary>
         /// Executes query and maps database entities to DTO list.
         /// </summary>
-        public async Task<List<AppointmentDto>> Handle(
+        public async Task<Result<List<AppointmentResponse>>> Handle(
             GetAllAppointmentsQuery request,
             CancellationToken cancellationToken)
         {
-            return await _context.Appointments
-                 .Where(a => !a.IsDeleted)
-                .Include(a => a.Doctor)
-                .Include(a => a.Patient)
-                .Select(a => new AppointmentDto
-                {
-                    Id = a.Id,
-                    DoctorName = a.Doctor.FullName,
-                    PatientName = a.Patient.FullName,
-                    StartTime = a.StartTime,
-                    EndTime = a.EndTime,
-                    Status = a.Status
-                })
-                .ToListAsync(cancellationToken);
+            var appointments = await _context.Appointments
+       .Select(a => new AppointmentResponse(
+           a.Id,
+           a.DoctorId,
+           a.PatientId,
+           a.StartTime,
+           a.EndTime,
+           a.Status))
+       .ToListAsync(cancellationToken);
+
+            return Result<List<AppointmentResponse>>.Ok(
+                appointments,
+                $"{appointments.Count} appointments found.");
+           
         }
     }
 }

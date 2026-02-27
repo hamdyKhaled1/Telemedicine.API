@@ -39,6 +39,14 @@ CREATE TABLE Appointments (
         CHECK (Status IN ('Scheduled','Completed','Cancelled'))
 );
 
+
+
+
+
+
+
+
+
 CREATE INDEX Appointments_Doctor_Time
 ON Appointments (DoctorId, StartTime, EndTime);
 
@@ -100,3 +108,29 @@ VALUES
 (5, 1, '2026-02-18 09:58:00');
 
 
+
+
+ALTER TABLE Appointments
+ALTER COLUMN Status INT NOT NULL;
+
+ALTER TABLE Appointments
+ADD CONSTRAINT DF_Appointments_Status DEFAULT 1 FOR Status;
+
+
+ALTER TABLE Appointments
+ADD CONSTRAINT CK_Appointments_Status
+CHECK (Status IN (1, 2, 3));
+
+ALTER TABLE Appointments
+ADD RowVersion ROWVERSION NOT NULL;
+
+
+CREATE TABLE Users (
+    Id       INT IDENTITY(1,1) PRIMARY KEY,
+    Email    NVARCHAR(150) NOT NULL UNIQUE,
+    Password NVARCHAR(256) NOT NULL,
+    Role     NVARCHAR(50)  NOT NULL DEFAULT 'Patient',
+    RefId    INT           NOT NULL,
+    CONSTRAINT CK_Users_Role 
+        CHECK (Role IN ('Doctor', 'Patient', 'Admin'))
+);

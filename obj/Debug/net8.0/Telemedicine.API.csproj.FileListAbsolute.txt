@@ -196,3 +196,6 @@ D:\Projects .Net\Telemedicine.API\Telemedicine.API\obj\Debug\net8.0\Telemedicine
 D:\Projects .Net\Telemedicine.API\Telemedicine.API\obj\Debug\net8.0\Telemedicine.API.genruntimeconfig.cache
 D:\Projects .Net\Telemedicine.API\Telemedicine.API\obj\Debug\net8.0\ref\Telemedicine.API.dll
 D:\Projects .Net\Telemedicine.API\Telemedicine.API\bin\Debug\net8.0\FluentValidation.DependencyInjectionExtensions.dll
+D:\Projects .Net\Telemedicine.API\Telemedicine.API\obj\Debug\net8.0\Telemedicine.API.sourcelink.json
+D:\Projects .Net\Telemedicine.API\Telemedicine.API\bin\Debug\net8.0\BCrypt.Net-Next.dll
+D:\Projects .Net\Telemedicine.API\Telemedicine.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
