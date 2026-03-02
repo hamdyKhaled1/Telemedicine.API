@@ -9,11 +9,11 @@ namespace Telemedicine.API.Features.Account
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AccountController : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public AuthController(IMediator mediator) => _mediator = mediator;
+        public AccountController(IMediator mediator) => _mediator = mediator;
 
         [HttpPost("register/patient")]
         public async Task<IActionResult> RegisterPatient(

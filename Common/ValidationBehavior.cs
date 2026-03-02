@@ -30,9 +30,9 @@ namespace Telemedicine.API.Common
 
             if (failures.Any())
             {
-                // بدل throw new ValidationException(failures);
+               
                 var errors = failures.Select(e => e.ErrorMessage).ToList();
-                // مش هينفع ترجع Result هنا مباشرة لأن TResponse مش دايما Result
+               
                 throw new ValidationException(failures);
             }
 

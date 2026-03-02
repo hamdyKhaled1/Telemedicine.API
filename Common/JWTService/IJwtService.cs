@@ -1,7 +1,9 @@
-﻿namespace Telemedicine.API.Common.JWTService
+﻿using Telemedicine.API.Features.Account;
+
+namespace Telemedicine.API.Common.JWTService
 {
     public interface IJwtService
     {
-        string GenerateToken(int userId, string email, string role);
+        string GenerateToken(ApplicationUser user, IList<string> roles);
     }
 }

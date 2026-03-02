@@ -1,5 +1,53 @@
 [
   {
+    "ContainingType": "Telemedicine.API.Features.Account.AccountController",
+    "Method": "Login",
+    "RelativePath": "api/Account/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "command",
+        "Type": "Telemedicine.API.Features.Account.Login.LoginCommand",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Telemedicine.API.Features.Account.AccountController",
+    "Method": "RegisterDoctor",
+    "RelativePath": "api/Account/register/doctor",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "command",
+        "Type": "Telemedicine.API.Features.Account.Register.RegisterDoctorCommand",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Telemedicine.API.Features.Account.AccountController",
+    "Method": "RegisterPatient",
+    "RelativePath": "api/Account/register/patient",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "command",
+        "Type": "Telemedicine.API.Features.Account.Register.RegisterPatientCommand",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Telemedicine.API.Features.Appointments.AppointmentsController",
     "Method": "Create",
     "RelativePath": "api/Appointments",
@@ -79,48 +127,21 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "Telemedicine.API.Features.Account.AuthController",
-    "Method": "Login",
-    "RelativePath": "api/Auth/login",
-    "HttpMethod": "POST",
+    "ContainingType": "Telemedicine.API.Features.Appointments.AppointmentsController",
+    "Method": "UpdateStatus",
+    "RelativePath": "api/Appointments/{id}/status",
+    "HttpMethod": "PATCH",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "command",
-        "Type": "Telemedicine.API.Features.Account.Login.LoginCommand",
+        "Name": "id",
+        "Type": "System.Int32",
         "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Telemedicine.API.Features.Account.AuthController",
-    "Method": "RegisterDoctor",
-    "RelativePath": "api/Auth/register/doctor",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
+      },
       {
-        "Name": "command",
-        "Type": "Telemedicine.API.Features.Account.Register.RegisterDoctorCommand",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "Telemedicine.API.Features.Account.AuthController",
-    "Method": "RegisterPatient",
-    "RelativePath": "api/Auth/register/patient",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "command",
-        "Type": "Telemedicine.API.Features.Account.Register.RegisterPatientCommand",
+        "Name": "newStatus",
+        "Type": "System.String",
         "IsRequired": true
       }
     ],

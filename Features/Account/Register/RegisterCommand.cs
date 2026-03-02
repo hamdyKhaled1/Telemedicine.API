@@ -6,12 +6,14 @@ namespace Telemedicine.API.Features.Account.Register
     public record RegisterPatientCommand(
         string Email,
         string Password,
-        int PatientId
+        string FullName,
+        string? Phone
     ) : IRequest<Result<string>>;
 
     public record RegisterDoctorCommand(
         string Email,
         string Password,
-        int DoctorId
+        string FullName,
+        string? Specialty
     ) : IRequest<Result<string>>;
 }

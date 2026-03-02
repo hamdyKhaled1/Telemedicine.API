@@ -8,6 +8,7 @@ using Telemedicine.API.Features.Appointments.Delete;
 using Telemedicine.API.Features.Appointments.GetAll;
 using Telemedicine.API.Features.Appointments.GetById;
 using Telemedicine.API.Features.Appointments.Update;
+using Telemedicine.API.Features.Appointments.Update.UpdateStatus;
 using Telemedicine.API.Infrastructure.Data;
 
 namespace Telemedicine.API.Features.Appointments
@@ -25,7 +26,7 @@ namespace Telemedicine.API.Features.Appointments
         }
 
         [HttpPost]
-        [Authorize(Roles = "Patient")]
+        [Authorize(Roles = "Patient,Admin")]
         public async Task<IActionResult> Create(CreateAppointmentCommand command)
         {
             var result = await _mediator.Send(command);
@@ -63,6 +64,16 @@ namespace Telemedicine.API.Features.Appointments
                 return BadRequest(new { Success = false, Message = "Id in URL must match Id in body." });
 
             var result = await _mediator.Send(command);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+        [HttpPatch("{id}/status")]
+        [Authorize(Roles = "Doctor,Admin")]
+        public async Task<IActionResult> UpdateStatus(
+    int id,
+    [FromBody] AppointmentStatus newStatus)
+        {
+            var result = await _mediator.Send(
+                new UpdateAppointmentStatusCommand(id, newStatus));
             return result.Success ? Ok(result) : BadRequest(result);
         }
 

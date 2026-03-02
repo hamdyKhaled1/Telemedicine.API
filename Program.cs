@@ -1,6 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -11,6 +12,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Telemedicine.API.Common;
 using Telemedicine.API.Common.JWTService;
+using Telemedicine.API.Features.Account;
 using Telemedicine.API.Hubs;
 using Telemedicine.API.Infrastructure.Data;
 
@@ -35,22 +37,37 @@ builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 QuestPDF.Settings.License = LicenseType.Community;
+// Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+})
+.AddEntityFrameworkStores<TelemedicineDbContext>()
+.AddDefaultTokenProviders();
 // JWT
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-        };
-    });
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+    };
+});
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IJwtService, JwtService>();
 // Swagger + Bearer Token
@@ -86,19 +103,32 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider
-        .GetRequiredService<TelemedicineDbContext>();
+    var roleManager = scope.ServiceProvider
+        .GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider
+        .GetRequiredService<UserManager<ApplicationUser>>();
 
-    if (!context.Users.Any(u => u.Role == "Admin"))
+    // Seed Roles
+    string[] roles = { "Admin", "Doctor", "Patient" };
+    foreach (var role in roles)
     {
-        context.Users.Add(new User
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+    }
+
+    // Seed Admin
+    var adminEmail = "admin@telemedicine.com";
+    if (await userManager.FindByEmailAsync(adminEmail) is null)
+    {
+        var admin = new ApplicationUser
         {
-            Email = "admin@telemedicine.com",
-            Password = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+            UserName = adminEmail,
+            Email = adminEmail,
             Role = "Admin",
             RefId = 0
-        });
-        await context.SaveChangesAsync();
+        };
+        await userManager.CreateAsync(admin, "Admin@123");
+        await userManager.AddToRoleAsync(admin, "Admin");
     }
 }
 
